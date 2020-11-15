@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, abort
 from . import schemas, services
-
+from email_validator import validate_email, EmailNotValidError
 from flask_pydantic import validate
 
 bond_bp = Blueprint('bond_routes', __name__, url_prefix='/api/v1/bonds')
@@ -26,7 +26,9 @@ def get_users():
 @user_bp.route("", methods=['POST'])
 @validate(body=schemas.UserCreate)
 def create_user(body: schemas.UserCreate):
-    from email_validator import validate_email, EmailNotValidError
+    user = services.get_user_by_email(body.email)
+    if user:
+        abort(400, "User with email already exists")
     try:
         valid = validate_email(body.email)
         body.email = valid.email

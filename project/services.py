@@ -19,8 +19,10 @@ def get_users():
     return serialize_data(users, schemas.User)
 
 def get_user_by_email(email: str):
-    user = db.query(User).filter(User.email == email)
-    return serialize_data(user, schemas.User)
+    user = db.query(User).filter(User.email == email).first()
+    if user:
+        return serialize_data(user, schemas.User)
+    return False
 
 def authenticate_user(email: str, password: str):
     user = get_user_by_email(db, email=email)
