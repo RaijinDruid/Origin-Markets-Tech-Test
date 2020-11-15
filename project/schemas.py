@@ -24,3 +24,18 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: Optional[str] = None
+
+
+class BondCreate(BaseModel):
+    isin: str
+    size: int
+    currency: str
+    maturity: str
+    lei: str
+
+class Bond(BondCreate):
+    id: int
+    legal_name: str
+    class Config:
+        orm_mode = True
+
