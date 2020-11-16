@@ -3,7 +3,7 @@ from project.app import create_app
 config = {
     "SQLALCHEMY_DATABASE_URL": "sqlite:///./sqlite.db",
     "ENV": "development",
-    "DEBUG":True,
+    "DEBUG": True,
     "SECRET_KEY": "would-get-from-env-file"
 }
 
