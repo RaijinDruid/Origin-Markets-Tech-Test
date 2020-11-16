@@ -49,7 +49,7 @@ def get_legal_name(lei: str):
     response = requests.get(f"https://leilookup.gleif.org/api/v2/leirecords?lei={lei}")
     data = response.json()
 
-    if not response.status_code == 200 or not data[0]['Entity']['LegalName']['$']:
+    if not response.status_code == 200 or not data or not data[0]['Entity']['LegalName']['$']:
         return False
 
     return data[0]['Entity']['LegalName']['$']

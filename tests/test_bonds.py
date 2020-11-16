@@ -28,6 +28,15 @@ def test_create_bond_invalid_auth_token(client):
     assert b"Could not validate credentials" in response.data
 
 
+def test_create_bond_invalid_lei(client):
+    invalid_bond = bond.copy()
+    invalid_bond['lei'] = "R0MUWSFPU8MPRO8K5P83zzz1"
+    token = __create_user(client)['access_token']
+    bond_response = client.post("/api/v1/bonds", json=invalid_bond, headers={'Authorization': token})
+    assert bond_response.status_code == 400
+    assert b"No legal entity exists for lei" in bond_response.data
+
+
 def test_create_bad_bond(client):
     invalid_bond = bond.copy()
     token = __create_user(client)['access_token']
