@@ -1,6 +1,5 @@
 
 from project.app import create_app
-import os
 import pytest
 
 
