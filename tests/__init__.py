@@ -6,7 +6,13 @@ import pytest
 
 @pytest.fixture
 def client():
-    app = create_app(config_mode="Test")
+    test_config = {
+        "SQLALCHEMY_DATABASE_URL": "sqlite:///./test-sqlite.db",
+        "ENV": "development",
+        "DEBUG": True,
+        "SECRET_KEY": "would-get-from-env-file"
+    }
+    app = create_app(test_config)
     with app.test_client() as client:
         yield client
 
