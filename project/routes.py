@@ -47,10 +47,9 @@ def has_auth_header(f):
     return decorated_function
 
 
-@token_bp.route("", methods=['POST'])
+@token_bp.route("", methods=['POST'], strict_slashes=False)
 @validate(body=schemas.UserCreate)
 def get_token(body: schemas.UserCreate):
-    print(body)
     user = services.authenticate_user(body.email, body.password)
     if not user:
         abort(401, "Could not validate credentials")
@@ -59,7 +58,7 @@ def get_token(body: schemas.UserCreate):
     return {"access_token": access_token}, 200
 
 
-@bond_bp.route("", methods=['GET'])
+@bond_bp.route("", methods=['GET'], strict_slashes=False)
 @has_auth_header
 @get_current_user
 def get_bonds(current_user: schemas.User):
@@ -74,7 +73,7 @@ def get_bonds(current_user: schemas.User):
     return jsonify(serialized_bonds), 200
 
 
-@bond_bp.route("", methods=["POST"])
+@bond_bp.route("", methods=["POST"], strict_slashes=False)
 @validate(body=schemas.BondCreate)
 @has_auth_header
 @get_current_user
@@ -90,13 +89,13 @@ def create_bond(body: schemas.BondCreate, current_user: schemas.User):
     return jsonify(serialized_bond), 201
 
 
-@user_bp.route("", methods=['GET'])
+@user_bp.route("", methods=['GET'], strict_slashes=False)
 def get_users():
     serialized_user = serialize_data(services.get_users(), schemas.User)
     return jsonify(serialized_user), 200
 
 
-@user_bp.route("", methods=['POST'])
+@user_bp.route("", methods=['POST'], strict_slashes=False)
 @validate(body=schemas.UserCreate)
 def create_user(body: schemas.UserCreate):
     user = services.get_user_by_email(body.email)
