@@ -15,7 +15,7 @@ Please test any additional logic you add.
 
 ## How to run
 
-`pip install -r requirements.txt`
+`pip install -r requirements.txt` to install packages
 `python3 main.py` to run server.
 `pytest -s` to run tests.
 
