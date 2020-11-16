@@ -56,7 +56,7 @@ def get_token(body: schemas.UserCreate):
         abort(401, "Could not validate credentials")
     access_token = services.security.create_access_token(
         data={"sub": "user_id:"+str(user.id)})
-    return access_token, 200
+    return {"access_token": access_token}, 200
 
 
 @bond_bp.route("", methods=['GET'])
@@ -66,6 +66,7 @@ def get_bonds(current_user: schemas.User):
     bonds = current_user.bonds
     if not bonds:
         return [], 200
+
     if request.args.get('legal_name'):
         bonds = [bond for bond in bonds if bond.legal_name == request.args.get('legal_name')]
 
@@ -86,7 +87,7 @@ def create_bond(body: schemas.BondCreate, current_user: schemas.User):
 
     new_bond = services.create_bond(body, current_user.id, legal_name)
     serialized_bond = serialize_data(new_bond, schemas.Bond)
-    return jsonify(serialized_bond), 200
+    return jsonify(serialized_bond), 201
 
 
 @user_bp.route("", methods=['GET'])
