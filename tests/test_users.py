@@ -1,12 +1,6 @@
 from tests import client
 
 
-def test_empty_users(client):
-    response = client.get('/api/v1/users')
-    assert response.status_code == 200
-    assert response.json == []
-
-
 def test_create_user_bad_password(client):
     user = {"email": "123@mail.com", "password": [123123]}
     response = client.post('/api/v1/users', json=user)
