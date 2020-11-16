@@ -42,7 +42,7 @@ def test_create_bad_bond(client):
 def test_create_bond(client):
     token = __create_user(client)['access_token']
     bond_response = client.post("/api/v1/bonds", json=bond, headers={'Authorization': token})
-    assert bond_response.status_code == 200
+    assert bond_response.status_code == 201
     assert bond_response.json == {
         "id": 1,
         "isin": "FR0000131104",
