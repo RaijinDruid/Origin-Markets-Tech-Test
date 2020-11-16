@@ -15,6 +15,10 @@ Please test any additional logic you add.
 
 ## How to run
 
+`pip install -r requirements.txt`
+`python3 main.py` to run server.
+`pytest -s` to run tests.
+
 ## API
 
 The following outlines the API:
