@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, abort
 from . import schemas, services
 from email_validator import validate_email, EmailNotValidError
 from flask_pydantic import validate
-from .util import serialize_data, has_auth_header
+from .util import serialize_data
 from jose import JWTError
 from functools import wraps
 from .security import decode_token
@@ -59,17 +59,18 @@ def get_token(body: schemas.UserCreate):
     return access_token, 200
 
 
-@bond_bp.route("/", methods=['GET'])
+@bond_bp.route("", methods=['GET'])
 @has_auth_header
 @get_current_user
-def get_bond(current_user: schemas.User):
-    bonds = serialize_data(current_user.bonds, schemas.Bond)
-    print(current_user.bonds)
-    print(bonds)
-    return jsonify(bonds), 200
+def get_bonds(current_user: schemas.User):
+    bonds = current_user.bonds
+    if not bonds:
+        return [], 200
     if request.args.get('legal_name'):
-        return jsonify(f"Legal name provided {request.args.get('legal_name')}")
-    return "Bonds Get Route"
+        bonds = [bond for bond in bonds if bond.legal_name == request.args.get('legal_name')]
+
+    serialized_bonds = serialize_data(bonds, schemas.Bond)
+    return jsonify(serialized_bonds), 200
 
 
 @bond_bp.route("", methods=["POST"])
@@ -78,7 +79,12 @@ def get_bond(current_user: schemas.User):
 @get_current_user
 def create_bond(body: schemas.BondCreate, current_user: schemas.User):
     access_token = request.headers['Authorization']
-    new_bond = services.create_bond(body, current_user.id)
+    legal_name = services.get_legal_name(body.lei)
+
+    if not legal_name:
+        return f"No legal entity exists for lei {body.lei}", 400
+
+    new_bond = services.create_bond(body, current_user.id, legal_name)
     serialized_bond = serialize_data(new_bond, schemas.Bond)
     return jsonify(serialized_bond), 200
 
@@ -102,12 +108,10 @@ def create_user(body: schemas.UserCreate):
         body.email = valid.email
 
         new_user = services.create_user(body)
-        access_token = services.security.create_access_token(
-            data={"sub": "user_id:"+str(new_user.id)})
+        access_token = services.security.create_access_token(data={"sub": "user_id:"+str(new_user.id)})
 
         serialized_new_user = serialize_data(new_user, schemas.User)
-        return jsonify({"data": {"user": serialized_new_user, "access_token": access_token},
-                        "msg": "Successfully created new user"}), 201
+        return jsonify({"data": {"user": serialized_new_user, "access_token": access_token}, "msg": "Successfully created new user"}), 201
 
     except EmailNotValidError as e:
         abort(400, e)
